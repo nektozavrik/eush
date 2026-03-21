@@ -14,6 +14,7 @@ const fonts = [
 
 let fontIndex = 0;
 let isAnimating = false;
+let animationTimer = null;
 
 const wrapLetters = node => {
   if (!node) return [];
@@ -34,6 +35,22 @@ const wrapLetters = node => {
 const wordLetters = wrapLetters(eushWord);
 const shadowLetters = wrapLetters(eushShadow);
 
+const applyFontState = family => {
+  if (eushWord) {
+    eushWord.style.fontFamily = family;
+    eushWord.style.opacity = "1";
+    eushWord.style.letterSpacing = "0.01em";
+    eushWord.style.filter = "blur(0)";
+  }
+
+  if (eushShadow) {
+    eushShadow.style.fontFamily = family;
+    eushShadow.style.opacity = "1";
+    eushShadow.style.letterSpacing = "0.01em";
+    eushShadow.style.filter = "blur(0)";
+  }
+};
+
 const animateLetters = (letters, phase) => {
   letters.forEach((letter, index) => {
     const direction = index % 2 === 0 ? -1 : 1;
@@ -51,7 +68,7 @@ const animateLetters = (letters, phase) => {
   });
 };
 
-window.setInterval(() => {
+const runTypographyCycle = () => {
   if (isAnimating) return;
   isAnimating = true;
   fontIndex = (fontIndex + 1) % fonts.length;
@@ -69,25 +86,53 @@ window.setInterval(() => {
   }
 
   window.setTimeout(() => {
-    eushWord.style.fontFamily = fonts[fontIndex];
-    eushWord.style.opacity = "1";
-    eushWord.style.letterSpacing = "0.01em";
-    eushWord.style.filter = "blur(0)";
-    animateLetters(wordLetters, "in");
+    window.requestAnimationFrame(() => {
+      applyFontState(fonts[fontIndex]);
+      animateLetters(wordLetters, "in");
 
-    if (eushShadow) {
-      eushShadow.style.fontFamily = fonts[fontIndex];
-      eushShadow.style.opacity = "1";
-      eushShadow.style.letterSpacing = "0.01em";
-      eushShadow.style.filter = "blur(0)";
-      animateLetters(shadowLetters, "in");
-    }
+      if (eushShadow) {
+        animateLetters(shadowLetters, "in");
+      }
+    });
   }, 420);
 
   window.setTimeout(() => {
     isAnimating = false;
   }, 1200);
-}, 3000);
+};
+
+const startTypographyCycle = () => {
+  if (!eushWord || animationTimer) return;
+
+  document.body.classList.add("fonts-ready");
+  applyFontState(fonts[fontIndex]);
+  animateLetters(wordLetters, "in");
+
+  if (eushShadow) {
+    animateLetters(shadowLetters, "in");
+  }
+
+  animationTimer = window.setInterval(runTypographyCycle, 3200);
+};
+
+const waitForTypography = async () => {
+  if (!("fonts" in document)) {
+    startTypographyCycle();
+    return;
+  }
+
+  const fontLoads = fonts.map(family => document.fonts.load(`700 72px ${family}`));
+  const readyGate = Promise.race([
+    Promise.allSettled(fontLoads),
+    new Promise(resolve => window.setTimeout(resolve, 1800))
+  ]);
+
+  await readyGate;
+  await document.fonts.ready.catch(() => {});
+  window.requestAnimationFrame(() => {
+    window.requestAnimationFrame(startTypographyCycle);
+  });
+};
 
 const observer = new IntersectionObserver(
   entries => {
@@ -114,3 +159,5 @@ if (heroPanel && heroMark && heroTags) {
 if (heroLine) {
   heroLine.remove();
 }
+
+waitForTypography();

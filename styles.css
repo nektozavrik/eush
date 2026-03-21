@@ -229,6 +229,19 @@ a {
   border: 1px solid var(--line);
   background: linear-gradient(180deg, var(--panel-strong), var(--panel));
   box-shadow: var(--shadow);
+  transition: transform 300ms ease, border-color 300ms ease, box-shadow 300ms ease, background 300ms ease;
+}
+
+.card:hover,
+.info-card:hover,
+.wide-card:hover,
+.cta-card:hover,
+.work-card:hover,
+.format-card:hover,
+.timeline-item:hover {
+  transform: translateY(-4px);
+  border-color: rgba(182, 141, 115, 0.2);
+  box-shadow: 0 22px 48px rgba(0, 0, 0, 0.16);
 }
 
 .hero-panel {
@@ -261,6 +274,12 @@ a {
   border-radius: 50%;
   background: radial-gradient(circle, rgba(182, 141, 115, 0.12), transparent 68%);
   filter: blur(10px);
+  animation: blobFloat 16s ease-in-out infinite;
+}
+
+.hero-panel > * {
+  position: relative;
+  z-index: 1;
 }
 
 .eyebrow {
@@ -301,6 +320,19 @@ a {
   overflow: hidden;
 }
 
+.eush-wrap::before {
+  content: "";
+  position: absolute;
+  left: -12%;
+  bottom: -20%;
+  width: 70%;
+  height: 70%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.08), transparent 70%);
+  filter: blur(18px);
+  animation: glowDrift 12s ease-in-out infinite;
+}
+
 .hero-side-photo {
   grid-column: 11 / span 2;
   grid-row: 1;
@@ -321,6 +353,13 @@ a {
   box-shadow: var(--shadow);
   filter: grayscale(0.06) contrast(1.03);
   transform: rotate(-4deg);
+  transition: transform 400ms ease, box-shadow 400ms ease, filter 400ms ease;
+}
+
+.hero-side-photo img:hover {
+  transform: rotate(-2deg) translateY(-4px);
+  box-shadow: 0 28px 56px rgba(0, 0, 0, 0.28);
+  filter: grayscale(0) contrast(1.06);
 }
 
 .section-divider {
@@ -374,6 +413,13 @@ a {
   transition: opacity 320ms ease, letter-spacing 600ms ease, transform 600ms ease, filter 600ms ease;
 }
 
+body:not(.fonts-ready) .eush-word,
+body:not(.fonts-ready) .eush-shadow {
+  transition: none;
+  opacity: 0.98;
+  filter: none;
+}
+
 .eush-word .letter,
 .eush-shadow .letter {
   display: inline-block;
@@ -395,6 +441,20 @@ a {
 .hero-copy-block {
   grid-column: 1 / span 8;
   grid-row: 3;
+  position: relative;
+}
+
+.hero-copy-block::after {
+  content: "Любим проекты, где мало слов и много результата.";
+  display: inline-flex;
+  margin-top: 18px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.35;
 }
 
 .hero-cta-side {
@@ -478,6 +538,13 @@ a {
   font-size: 0.84rem;
   white-space: nowrap;
   flex: 0 0 auto;
+  transition: transform 240ms ease, border-color 240ms ease, background 240ms ease;
+}
+
+.hero-tags span:hover {
+  transform: translateY(-1px);
+  border-color: rgba(182, 141, 115, 0.32);
+  background: rgba(255, 255, 255, 0.07);
 }
 
 h1,
@@ -913,13 +980,35 @@ h2 {
 
 .reveal {
   opacity: 0;
-  transform: translateY(12px);
-  transition: opacity 560ms ease, transform 560ms ease;
+  transform: translateY(18px);
+  transition: opacity 720ms ease, transform 720ms cubic-bezier(.22, 1, .36, 1);
 }
 
 .reveal.is-visible {
   opacity: 1;
   transform: translateY(0);
+}
+
+@keyframes blobFloat {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(-18px, 12px, 0) scale(1.05);
+  }
+}
+
+@keyframes glowDrift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.85;
+  }
+  50% {
+    transform: translate3d(14px, -10px, 0) scale(1.08);
+    opacity: 1;
+  }
 }
 
 @keyframes drift {
